@@ -24,3 +24,55 @@ Langkah berikutnya adalah menulis kode program untuk aplikasi client. Aplikasi c
 $wsdl = "http://localhost/sid/soapjsonserver.php?wsdl"; $client = new nusoap_client($wsdl,'wsdl');
 
 $error = $client->getError(); if ($error) { echo "
+# Constructor error
+
+" . $error . "
+"; exit(); }
+$result = $client->call("getProd", array("category" => "profile"));
+
+if ($result) { echo "Hasil: " . $result; print("
+
+"); $ojson = json_decode($result); print_r( $ojson ); print("
+"); echo "Nama: " . $ojson->nama ."
+"; echo "NIM: " . $ojson->nim ."
+"; echo "Alamat: " . $ojson->alamat ."
+"; echo "IPK: " . $ojson->ipk ."
+";
+} else {
+
+}
+
+5. <?php require_once "lib/nusoap.php";
+
+function getProd($category) {
+    if ($category == "profile") {
+
+
+        $buku = array("The WordPress Anthology",
+            "PHP Master: Write Cutting Edge Code",
+            "Build Your Own Website the Right Way");
+
+
+        $profile = array(
+                "nama" => "Dyah",
+                "nim" => "L200130035",
+                "alamat" => "Salatiga",
+                "ipk" => 3,25
+        );
+
+        //$profile["nama"]   ... output = "Dyah" 
+
+
+        $output = json_encode( $profile );  //konversi array assc -> json string
+
+        return  $output;
+    }
+    else {
+        return "No products listed under that category";
+    }
+}
+$server = new soap_server(); // $server->register("getProd");
+
+$server->configureWSDL("productlist", "urn:productlist"); // $server->wsdl->schemaTargetNamespace = 'urn:productlist/xsd/'; $server->register("getProd", array("category" => "xsd:string"), array("return" => "xsd:string"), "urn:productlist", "urn:productlist#getProd", "rpc", "encoded", "Get a listing of products by category");
+
+$HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : ''; $server->service($HTTP_RAW_POST_DATA);
